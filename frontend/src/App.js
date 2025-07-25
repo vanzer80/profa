@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import axios from 'axios';
 import { 
@@ -17,7 +17,14 @@ import {
   LogOut,
   Plus,
   Coins,
-  Zap
+  Zap,
+  Upload,
+  Mic,
+  MicOff,
+  Volume2,
+  Camera,
+  FileText,
+  Image as ImageIcon
 } from 'lucide-react';
 import './App.css';
 
