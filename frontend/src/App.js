@@ -495,72 +495,72 @@ function Dashboard({ user }) {
     ((dashboardData.user.xp % 100) / 100) * 100 : 0;
 
   return (
-    <div className="flex-1 p-8 overflow-y-auto">
+    <div className="flex-1 p-4 lg:p-8 overflow-y-auto">
       <div className="max-w-7xl mx-auto">
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
+        <div className="mb-6 lg:mb-8">
+          <h1 className="text-2xl lg:text-3xl font-bold text-gray-900 dark:text-white mb-2">
             Olá, {dashboardData?.user.full_name}!
           </h1>
-          <p className="text-gray-600 dark:text-gray-400">
+          <p className="text-gray-600 dark:text-gray-400 text-sm lg:text-base">
             Vamos continuar aprendendo hoje? 📚
           </p>
         </div>
 
         {/* Stats Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-          <div className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-sm">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 lg:gap-6 mb-6 lg:mb-8">
+          <div className="bg-white dark:bg-gray-800 p-3 lg:p-6 rounded-xl shadow-sm">
             <div className="flex items-center">
-              <Trophy className="w-8 h-8 text-yellow-500 mr-3" />
+              <Trophy className="w-6 h-6 lg:w-8 lg:h-8 text-yellow-500 mr-2 lg:mr-3" />
               <div>
-                <p className="text-sm text-gray-500 dark:text-gray-400">Nível</p>
-                <p className="text-2xl font-bold text-gray-900 dark:text-white">
+                <p className="text-xs lg:text-sm text-gray-500 dark:text-gray-400">Nível</p>
+                <p className="text-lg lg:text-2xl font-bold text-gray-900 dark:text-white">
                   {dashboardData?.user.level}
                 </p>
               </div>
             </div>
-            <div className="mt-4">
-              <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
+            <div className="mt-3 lg:mt-4">
+              <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-1.5 lg:h-2">
                 <div 
-                  className="bg-yellow-500 h-2 rounded-full" 
+                  className="bg-yellow-500 h-1.5 lg:h-2 rounded-full" 
                   style={{ width: `${progressToNextLevel}%` }}
                 ></div>
               </div>
               <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                {dashboardData?.user.xp % 100}/100 XP para próximo nível
+                {dashboardData?.user.xp % 100}/100 XP
               </p>
             </div>
           </div>
 
-          <div className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-sm">
+          <div className="bg-white dark:bg-gray-800 p-3 lg:p-6 rounded-xl shadow-sm">
             <div className="flex items-center">
-              <Zap className="w-8 h-8 text-blue-500 mr-3" />
+              <Zap className="w-6 h-6 lg:w-8 lg:h-8 text-blue-500 mr-2 lg:mr-3" />
               <div>
-                <p className="text-sm text-gray-500 dark:text-gray-400">Total XP</p>
-                <p className="text-2xl font-bold text-gray-900 dark:text-white">
+                <p className="text-xs lg:text-sm text-gray-500 dark:text-gray-400">XP</p>
+                <p className="text-lg lg:text-2xl font-bold text-gray-900 dark:text-white">
                   {dashboardData?.user.xp}
                 </p>
               </div>
             </div>
           </div>
 
-          <div className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-sm">
+          <div className="bg-white dark:bg-gray-800 p-3 lg:p-6 rounded-xl shadow-sm">
             <div className="flex items-center">
-              <Coins className="w-8 h-8 text-yellow-500 mr-3" />
+              <Coins className="w-6 h-6 lg:w-8 lg:h-8 text-yellow-500 mr-2 lg:mr-3" />
               <div>
-                <p className="text-sm text-gray-500 dark:text-gray-400">Moedas</p>
-                <p className="text-2xl font-bold text-gray-900 dark:text-white">
+                <p className="text-xs lg:text-sm text-gray-500 dark:text-gray-400">Moedas</p>
+                <p className="text-lg lg:text-2xl font-bold text-gray-900 dark:text-white">
                   {dashboardData?.user.coins}
                 </p>
               </div>
             </div>
           </div>
 
-          <div className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-sm">
+          <div className="bg-white dark:bg-gray-800 p-3 lg:p-6 rounded-xl shadow-sm">
             <div className="flex items-center">
-              <MessageSquare className="w-8 h-8 text-green-500 mr-3" />
+              <MessageSquare className="w-6 h-6 lg:w-8 lg:h-8 text-green-500 mr-2 lg:mr-3" />
               <div>
-                <p className="text-sm text-gray-500 dark:text-gray-400">Conversas</p>
-                <p className="text-2xl font-bold text-gray-900 dark:text-white">
+                <p className="text-xs lg:text-sm text-gray-500 dark:text-gray-400">Conversas</p>
+                <p className="text-lg lg:text-2xl font-bold text-gray-900 dark:text-white">
                   {dashboardData?.stats.total_conversations}
                 </p>
               </div>
@@ -568,40 +568,40 @@ function Dashboard({ user }) {
           </div>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8">
           {/* Quick Actions */}
-          <div className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-sm">
-            <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">
+          <div className="bg-white dark:bg-gray-800 p-4 lg:p-6 rounded-xl shadow-sm">
+            <h2 className="text-lg lg:text-xl font-semibold text-gray-900 dark:text-white mb-4">
               Ações Rápidas
             </h2>
             <div className="space-y-3">
               <a 
                 href="/chat"
-                className="flex items-center p-4 bg-blue-50 dark:bg-blue-900 rounded-lg hover:bg-blue-100 dark:hover:bg-blue-800 transition-colors"
+                className="flex items-center p-3 lg:p-4 bg-blue-50 dark:bg-blue-900 rounded-lg hover:bg-blue-100 dark:hover:bg-blue-800 transition-colors"
               >
-                <Plus className="w-6 h-6 text-blue-600 dark:text-blue-400 mr-3" />
+                <Plus className="w-5 h-5 lg:w-6 lg:h-6 text-blue-600 dark:text-blue-400 mr-3" />
                 <div>
-                  <p className="font-medium text-blue-900 dark:text-blue-100">Nova Conversa</p>
-                  <p className="text-sm text-blue-600 dark:text-blue-300">Começar um novo chat</p>
+                  <p className="font-medium text-blue-900 dark:text-blue-100 text-sm lg:text-base">Nova Conversa</p>
+                  <p className="text-xs lg:text-sm text-blue-600 dark:text-blue-300">Começar um novo chat</p>
                 </div>
               </a>
               
               <a 
                 href="/perfil"
-                className="flex items-center p-4 bg-green-50 dark:bg-green-900 rounded-lg hover:bg-green-100 dark:hover:bg-green-800 transition-colors"
+                className="flex items-center p-3 lg:p-4 bg-green-50 dark:bg-green-900 rounded-lg hover:bg-green-100 dark:hover:bg-green-800 transition-colors"
               >
-                <User className="w-6 h-6 text-green-600 dark:text-green-400 mr-3" />
+                <User className="w-5 h-5 lg:w-6 lg:h-6 text-green-600 dark:text-green-400 mr-3" />
                 <div>
-                  <p className="font-medium text-green-900 dark:text-green-100">Editar Perfil</p>
-                  <p className="text-sm text-green-600 dark:text-green-300">Atualizar informações</p>
+                  <p className="font-medium text-green-900 dark:text-green-100 text-sm lg:text-base">Editar Perfil</p>
+                  <p className="text-xs lg:text-sm text-green-600 dark:text-green-300">Atualizar informações</p>
                 </div>
               </a>
             </div>
           </div>
 
           {/* Conquistas */}
-          <div className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-sm">
-            <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">
+          <div className="bg-white dark:bg-gray-800 p-4 lg:p-6 rounded-xl shadow-sm">
+            <h2 className="text-lg lg:text-xl font-semibold text-gray-900 dark:text-white mb-4">
               Conquistas
             </h2>
             <div className="space-y-3">
@@ -614,20 +614,20 @@ function Dashboard({ user }) {
                       : 'bg-gray-50 dark:bg-gray-700'
                   }`}
                 >
-                  <Trophy className={`w-6 h-6 mr-3 ${
+                  <Trophy className={`w-5 h-5 lg:w-6 lg:h-6 mr-3 ${
                     achievement.unlocked 
                       ? 'text-yellow-500' 
                       : 'text-gray-400'
                   }`} />
-                  <div>
-                    <p className={`font-medium ${
+                  <div className="flex-1 min-w-0">
+                    <p className={`font-medium text-sm lg:text-base ${
                       achievement.unlocked 
                         ? 'text-yellow-900 dark:text-yellow-100' 
                         : 'text-gray-500 dark:text-gray-400'
                     }`}>
                       {achievement.name}
                     </p>
-                    <p className={`text-sm ${
+                    <p className={`text-xs lg:text-sm ${
                       achievement.unlocked 
                         ? 'text-yellow-600 dark:text-yellow-300' 
                         : 'text-gray-400'
@@ -636,7 +636,7 @@ function Dashboard({ user }) {
                     </p>
                   </div>
                   {achievement.unlocked && (
-                    <CheckCircle className="w-5 h-5 text-green-500 ml-auto" />
+                    <CheckCircle className="w-4 h-4 lg:w-5 lg:h-5 text-green-500 ml-2" />
                   )}
                 </div>
               ))}
@@ -646,8 +646,8 @@ function Dashboard({ user }) {
 
         {/* Recent Conversations */}
         {dashboardData?.recent_conversations.length > 0 && (
-          <div className="mt-8 bg-white dark:bg-gray-800 p-6 rounded-xl shadow-sm">
-            <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">
+          <div className="mt-6 lg:mt-8 bg-white dark:bg-gray-800 p-4 lg:p-6 rounded-xl shadow-sm">
+            <h2 className="text-lg lg:text-xl font-semibold text-gray-900 dark:text-white mb-4">
               Conversas Recentes
             </h2>
             <div className="space-y-3">
@@ -655,14 +655,14 @@ function Dashboard({ user }) {
                 <a
                   key={conversation.id}
                   href={`/chat/${conversation.id}`}
-                  className="flex items-center p-4 hover:bg-gray-50 dark:hover:bg-gray-700 rounded-lg transition-colors"
+                  className="flex items-center p-3 lg:p-4 hover:bg-gray-50 dark:hover:bg-gray-700 rounded-lg transition-colors"
                 >
-                  <BookOpen className="w-6 h-6 text-blue-500 mr-3" />
-                  <div className="flex-1">
-                    <p className="font-medium text-gray-900 dark:text-white">
+                  <BookOpen className="w-5 h-5 lg:w-6 lg:h-6 text-blue-500 mr-3 flex-shrink-0" />
+                  <div className="flex-1 min-w-0">
+                    <p className="font-medium text-gray-900 dark:text-white text-sm lg:text-base truncate">
                       {conversation.title}
                     </p>
-                    <p className="text-sm text-gray-500 dark:text-gray-400">
+                    <p className="text-xs lg:text-sm text-gray-500 dark:text-gray-400 truncate">
                       {conversation.subject} • {new Date(conversation.updated_at).toLocaleDateString('pt-BR')}
                     </p>
                   </div>
