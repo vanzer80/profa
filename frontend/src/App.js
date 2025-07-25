@@ -1137,8 +1137,8 @@ function MessageBubble({ message }) {
   if (isUser) {
     return (
       <div className="flex justify-end">
-        <div className="max-w-xs lg:max-w-md px-4 py-2 bg-blue-600 text-white rounded-lg">
-          <p>{message.content}</p>
+        <div className="max-w-[85%] sm:max-w-xs lg:max-w-md px-3 lg:px-4 py-2 bg-blue-600 text-white rounded-lg">
+          <p className="text-sm lg:text-base">{message.content}</p>
           <div className="flex items-center justify-between mt-1">
             <span className="text-xs opacity-75">
               {message.message_type === 'help' && '🆘 Ajuda'} 
@@ -1161,13 +1161,13 @@ function MessageBubble({ message }) {
   
   return (
     <div className="flex justify-start">
-      <div className="max-w-xs lg:max-w-2xl">
-        <div className="bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg p-4 shadow-sm">
+      <div className="max-w-[95%] sm:max-w-lg lg:max-w-2xl">
+        <div className="bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg p-3 lg:p-4 shadow-sm">
           {aiResponse && (
             <>
               {/* Intro */}
-              <div className="mb-3 p-3 bg-blue-50 dark:bg-blue-900 rounded-lg">
-                <p className="text-blue-800 dark:text-blue-200 font-medium">
+              <div className="mb-3 p-2 lg:p-3 bg-blue-50 dark:bg-blue-900 rounded-lg">
+                <p className="text-blue-800 dark:text-blue-200 font-medium text-sm lg:text-base">
                   {aiResponse.intro}
                 </p>
               </div>
@@ -1175,12 +1175,12 @@ function MessageBubble({ message }) {
               {/* Steps */}
               {aiResponse.steps && aiResponse.steps.length > 0 && (
                 <div className="mb-3">
-                  <h4 className="font-semibold text-gray-900 dark:text-white mb-2">
+                  <h4 className="font-semibold text-gray-900 dark:text-white mb-2 text-sm lg:text-base">
                     Passos:
                   </h4>
                   <ol className="list-decimal list-inside space-y-1">
                     {aiResponse.steps.map((step, index) => (
-                      <li key={index} className="text-gray-700 dark:text-gray-300">
+                      <li key={index} className="text-gray-700 dark:text-gray-300 text-sm lg:text-base">
                         {step}
                       </li>
                     ))}
@@ -1190,21 +1190,21 @@ function MessageBubble({ message }) {
 
               {/* Explanation */}
               <div className="mb-3">
-                <h4 className="font-semibold text-gray-900 dark:text-white mb-2">
+                <h4 className="font-semibold text-gray-900 dark:text-white mb-2 text-sm lg:text-base">
                   Explicação:
                 </h4>
-                <p className="text-gray-700 dark:text-gray-300">
+                <p className="text-gray-700 dark:text-gray-300 text-sm lg:text-base leading-relaxed">
                   {aiResponse.explanation}
                 </p>
               </div>
 
               {/* Final Answer (only for answer type) */}
               {aiResponse.final_answer && (
-                <div className="mb-3 p-3 bg-green-50 dark:bg-green-900 rounded-lg">
-                  <h4 className="font-semibold text-green-800 dark:text-green-200 mb-2">
+                <div className="mb-3 p-2 lg:p-3 bg-green-50 dark:bg-green-900 rounded-lg">
+                  <h4 className="font-semibold text-green-800 dark:text-green-200 mb-2 text-sm lg:text-base">
                     Resposta Final:
                   </h4>
-                  <p className="text-green-700 dark:text-green-300">
+                  <p className="text-green-700 dark:text-green-300 text-sm lg:text-base">
                     {aiResponse.final_answer}
                   </p>
                 </div>
@@ -1213,12 +1213,12 @@ function MessageBubble({ message }) {
               {/* Examples */}
               {aiResponse.examples && aiResponse.examples.length > 0 && (
                 <div className="mb-3">
-                  <h4 className="font-semibold text-gray-900 dark:text-white mb-2">
+                  <h4 className="font-semibold text-gray-900 dark:text-white mb-2 text-sm lg:text-base">
                     Exemplos:
                   </h4>
                   <ul className="list-disc list-inside space-y-1">
                     {aiResponse.examples.map((example, index) => (
-                      <li key={index} className="text-gray-700 dark:text-gray-300">
+                      <li key={index} className="text-gray-700 dark:text-gray-300 text-sm lg:text-base">
                         {example}
                       </li>
                     ))}
@@ -1229,12 +1229,12 @@ function MessageBubble({ message }) {
               {/* Follow-up Questions */}
               {aiResponse.follow_up_questions && aiResponse.follow_up_questions.length > 0 && (
                 <div className="mb-3">
-                  <h4 className="font-semibold text-gray-900 dark:text-white mb-2">
+                  <h4 className="font-semibold text-gray-900 dark:text-white mb-2 text-sm lg:text-base">
                     Perguntas para refletir:
                   </h4>
                   <ul className="list-disc list-inside space-y-1">
                     {aiResponse.follow_up_questions.map((question, index) => (
-                      <li key={index} className="text-gray-700 dark:text-gray-300">
+                      <li key={index} className="text-gray-700 dark:text-gray-300 text-sm lg:text-base">
                         {question}
                       </li>
                     ))}
@@ -1244,14 +1244,14 @@ function MessageBubble({ message }) {
 
               {/* XP and Coins earned + Audio Button */}
               <div className="flex items-center justify-between pt-2 border-t border-gray-200 dark:border-gray-600">
-                <div className="flex items-center space-x-4">
+                <div className="flex items-center space-x-2 lg:space-x-4 flex-wrap">
                   <div className="flex items-center text-yellow-600">
-                    <Zap className="w-4 h-4 mr-1" />
-                    <span className="text-sm font-medium">+{aiResponse.xp} XP</span>
+                    <Zap className="w-3 h-3 lg:w-4 lg:h-4 mr-1" />
+                    <span className="text-xs lg:text-sm font-medium">+{aiResponse.xp} XP</span>
                   </div>
                   <div className="flex items-center text-yellow-500">
-                    <Coins className="w-4 h-4 mr-1" />
-                    <span className="text-sm font-medium">+{aiResponse.coins}</span>
+                    <Coins className="w-3 h-3 lg:w-4 lg:h-4 mr-1" />
+                    <span className="text-xs lg:text-sm font-medium">+{aiResponse.coins}</span>
                   </div>
                   <button
                     onClick={() => playAudio(aiResponse.explanation)}
@@ -1259,11 +1259,11 @@ function MessageBubble({ message }) {
                     className="flex items-center text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-200 disabled:opacity-50"
                     title="Ouvir resposta"
                   >
-                    <Volume2 className="w-4 h-4 mr-1" />
+                    <Volume2 className="w-3 h-3 lg:w-4 lg:h-4 mr-1" />
                     <span className="text-xs">{isPlaying ? 'Tocando...' : 'Ouvir'}</span>
                   </button>
                 </div>
-                <span className="text-xs text-gray-500 dark:text-gray-400">
+                <span className="text-xs text-gray-500 dark:text-gray-400 whitespace-nowrap ml-2">
                   {new Date(message.created_at).toLocaleTimeString('pt-BR', { 
                     hour: '2-digit', 
                     minute: '2-digit' 
