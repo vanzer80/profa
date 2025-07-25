@@ -129,6 +129,7 @@ class ProfAITester:
     def test_user_login(self):
         """Test user login endpoint"""
         try:
+            # Use a known existing user for login test
             login_data = {
                 "email": "maria.silva@escola.com",
                 "password": "MinhaSenh@123"
