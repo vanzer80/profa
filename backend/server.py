@@ -436,8 +436,8 @@ async def chat(
             role="assistant",
             message_type=chat_request.request_type,
             ai_response=ai_response,
-            xp_earned=ai_response.get("xp", 0),
-            coins_earned=ai_response.get("coins", 0)
+            xp_earned=int(ai_response.get("xp", 0)),
+            coins_earned=int(ai_response.get("coins", 0))
         )
         
         await db.messages.insert_one(assistant_message.dict())
