@@ -442,13 +442,16 @@ async def chat(
         
         await db.messages.insert_one(assistant_message.dict())
         
-        # Update user XP and coins
+        # Update user XP and coins (ensure numeric values)
+        xp_earned = int(ai_response.get("xp", 0))
+        coins_earned = int(ai_response.get("coins", 0))
+        
         await db.users.update_one(
             {"id": current_user.id},
             {
                 "$inc": {
-                    "xp": ai_response.get("xp", 0),
-                    "coins": ai_response.get("coins", 0)
+                    "xp": xp_earned,
+                    "coins": coins_earned
                 }
             }
         )
