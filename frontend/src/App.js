@@ -871,15 +871,42 @@ function ChatInterface({ user }) {
   }
 
   return (
-    <div className="flex-1 flex">
+    <div className="flex-1 flex h-full">
+      {/* Mobile Conversations Backdrop */}
+      {showConversations && (
+        <div 
+          className="fixed inset-0 bg-black bg-opacity-50 z-40 lg:hidden"
+          onClick={() => setShowConversations(false)}
+        />
+      )}
+
       {/* Conversations Sidebar */}
-      <div className="w-80 bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 flex flex-col">
+      <div className={`
+        ${showConversations ? 'translate-x-0' : '-translate-x-full'} 
+        lg:translate-x-0 lg:relative fixed left-0 top-0 bottom-0 z-50 
+        w-80 max-w-[80vw] bg-white dark:bg-gray-800 
+        border-r border-gray-200 dark:border-gray-700 
+        flex flex-col transition-transform duration-300 ease-in-out
+      `}>
+        {/* Mobile header for conversations */}
+        <div className="lg:hidden flex items-center justify-between p-4 border-b border-gray-200 dark:border-gray-700">
+          <h3 className="font-semibold text-gray-900 dark:text-white">Conversas</h3>
+          <button
+            onClick={() => setShowConversations(false)}
+            className="p-1 rounded-lg text-gray-500 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-700"
+          >
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+        </div>
+
         <div className="p-4 border-b border-gray-200 dark:border-gray-700">
           <button
             onClick={() => setShowNewChat(true)}
-            className="w-full flex items-center justify-center p-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg"
+            className="w-full flex items-center justify-center p-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm"
           >
-            <Plus className="w-5 h-5 mr-2" />
+            <Plus className="w-4 h-4 mr-2" />
             Nova Conversa
           </button>
         </div>
@@ -888,15 +915,18 @@ function ChatInterface({ user }) {
           {conversations.map((conv) => (
             <div
               key={conv.id}
-              onClick={() => selectConversation(conv)}
-              className={`p-4 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700 border-b border-gray-100 dark:border-gray-600 ${
+              onClick={() => {
+                selectConversation(conv);
+                setShowConversations(false);
+              }}
+              className={`p-3 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700 border-b border-gray-100 dark:border-gray-600 ${
                 currentConversation?.id === conv.id ? 'bg-blue-50 dark:bg-blue-900' : ''
               }`}
             >
-              <p className="font-medium text-gray-900 dark:text-white truncate">
+              <p className="font-medium text-gray-900 dark:text-white truncate text-sm">
                 {conv.title}
               </p>
-              <p className="text-sm text-gray-500 dark:text-gray-400">
+              <p className="text-xs text-gray-500 dark:text-gray-400 truncate">
                 {conv.subject}
               </p>
               <p className="text-xs text-gray-400 dark:text-gray-500">
@@ -908,21 +938,31 @@ function ChatInterface({ user }) {
       </div>
 
       {/* Chat Area */}
-      <div className="flex-1 flex flex-col">
+      <div className="flex-1 flex flex-col min-w-0">
         {currentConversation ? (
           <>
             {/* Chat Header */}
-            <div className="p-4 border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">
-              <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
-                {currentConversation.title}
-              </h2>
-              <p className="text-sm text-gray-500 dark:text-gray-400">
-                {currentConversation.subject}
-              </p>
+            <div className="p-3 lg:p-4 border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 flex items-center">
+              <button
+                onClick={() => setShowConversations(true)}
+                className="lg:hidden p-2 rounded-lg text-gray-500 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-700 mr-3"
+              >
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+                </svg>
+              </button>
+              <div className="min-w-0 flex-1">
+                <h2 className="text-base lg:text-lg font-semibold text-gray-900 dark:text-white truncate">
+                  {currentConversation.title}
+                </h2>
+                <p className="text-xs lg:text-sm text-gray-500 dark:text-gray-400 truncate">
+                  {currentConversation.subject}
+                </p>
+              </div>
             </div>
 
             {/* Messages */}
-            <div className="flex-1 overflow-y-auto p-4 space-y-4">
+            <div className="flex-1 overflow-y-auto p-3 lg:p-4 space-y-3 lg:space-y-4">
               {messages.map((message) => (
                 <MessageBubble key={message.id} message={message} />
               ))}
@@ -934,63 +974,66 @@ function ChatInterface({ user }) {
             </div>
 
             {/* Input Area */}
-            <div className="p-4 border-t border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">
-              {/* Action Buttons Row */}
-              <div className="flex space-x-2 mb-3 flex-wrap">
+            <div className="p-3 lg:p-4 border-t border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">
+              {/* Action Buttons Row - Stack on mobile */}
+              <div className="grid grid-cols-3 lg:flex lg:space-x-2 gap-2 mb-3">
                 <button
                   onClick={() => sendMessage('help')}
                   disabled={!newMessage.trim() || loading}
-                  className="flex items-center px-3 py-1 bg-blue-100 hover:bg-blue-200 dark:bg-blue-800 dark:hover:bg-blue-700 text-blue-700 dark:text-blue-300 rounded-full text-sm disabled:opacity-50"
+                  className="flex items-center justify-center px-2 lg:px-3 py-1 bg-blue-100 hover:bg-blue-200 dark:bg-blue-800 dark:hover:bg-blue-700 text-blue-700 dark:text-blue-300 rounded-full text-xs lg:text-sm disabled:opacity-50"
                 >
-                  <HelpCircle className="w-4 h-4 mr-1" />
-                  Quero ajuda (+10 XP)
+                  <HelpCircle className="w-3 h-3 lg:w-4 lg:h-4 lg:mr-1" />
+                  <span className="hidden lg:inline ml-1">Ajuda (+10)</span>
+                  <span className="lg:hidden ml-1">Ajuda</span>
                 </button>
                 <button
                   onClick={() => sendMessage('hint')}
                   disabled={!newMessage.trim() || loading}
-                  className="flex items-center px-3 py-1 bg-yellow-100 hover:bg-yellow-200 dark:bg-yellow-800 dark:hover:bg-yellow-700 text-yellow-700 dark:text-yellow-300 rounded-full text-sm disabled:opacity-50"
+                  className="flex items-center justify-center px-2 lg:px-3 py-1 bg-yellow-100 hover:bg-yellow-200 dark:bg-yellow-800 dark:hover:bg-yellow-700 text-yellow-700 dark:text-yellow-300 rounded-full text-xs lg:text-sm disabled:opacity-50"
                 >
-                  <Lightbulb className="w-4 h-4 mr-1" />
-                  Dica (+5 XP)
+                  <Lightbulb className="w-3 h-3 lg:w-4 lg:h-4 lg:mr-1" />
+                  <span className="hidden lg:inline ml-1">Dica (+5)</span>
+                  <span className="lg:hidden ml-1">Dica</span>
                 </button>
                 <button
                   onClick={() => sendMessage('answer')}
                   disabled={!newMessage.trim() || loading}
-                  className="flex items-center px-3 py-1 bg-green-100 hover:bg-green-200 dark:bg-green-800 dark:hover:bg-green-700 text-green-700 dark:text-green-300 rounded-full text-sm disabled:opacity-50"
+                  className="flex items-center justify-center px-2 lg:px-3 py-1 bg-green-100 hover:bg-green-200 dark:bg-green-800 dark:hover:bg-green-700 text-green-700 dark:text-green-300 rounded-full text-xs lg:text-sm disabled:opacity-50"
                 >
-                  <CheckCircle className="w-4 h-4 mr-1" />
-                  Ver resposta (+2 XP)
+                  <CheckCircle className="w-3 h-3 lg:w-4 lg:h-4 lg:mr-1" />
+                  <span className="hidden lg:inline ml-1">Resposta (+2)</span>
+                  <span className="lg:hidden ml-1">Resp</span>
                 </button>
               </div>
 
               {/* Multimedia Buttons Row */}
-              <div className="flex space-x-2 mb-3">
+              <div className="flex space-x-2 mb-3 overflow-x-auto">
                 <button
                   onClick={() => fileInputRef.current?.click()}
-                  className="flex items-center px-3 py-1 bg-purple-100 hover:bg-purple-200 dark:bg-purple-800 dark:hover:bg-purple-700 text-purple-700 dark:text-purple-300 rounded-full text-sm"
+                  className="flex items-center px-3 py-1 bg-purple-100 hover:bg-purple-200 dark:bg-purple-800 dark:hover:bg-purple-700 text-purple-700 dark:text-purple-300 rounded-full text-xs whitespace-nowrap"
                   title="Upload PDF/Documento"
                 >
-                  <FileText className="w-4 h-4 mr-1" />
+                  <FileText className="w-3 h-3 lg:w-4 lg:h-4 mr-1" />
                   Arquivo
                 </button>
                 <button
                   onClick={() => imageInputRef.current?.click()}
-                  className="flex items-center px-3 py-1 bg-indigo-100 hover:bg-indigo-200 dark:bg-indigo-800 dark:hover:bg-indigo-700 text-indigo-700 dark:text-indigo-300 rounded-full text-sm"
+                  className="flex items-center px-3 py-1 bg-indigo-100 hover:bg-indigo-200 dark:bg-indigo-800 dark:hover:bg-indigo-700 text-indigo-700 dark:text-indigo-300 rounded-full text-xs whitespace-nowrap"
                   title="Upload Imagem"
                 >
-                  <ImageIcon className="w-4 h-4 mr-1" />
+                  <ImageIcon className="w-3 h-3 lg:w-4 lg:h-4 mr-1" />
                   Foto
                 </button>
                 <button
                   onClick={isRecording ? stopRecording : startRecording}
-                  className={`flex items-center px-3 py-1 rounded-full text-sm ${
+                  className={`flex items-center px-3 py-1 rounded-full text-xs whitespace-nowrap ${
                     isRecording 
                       ? 'bg-red-100 hover:bg-red-200 dark:bg-red-800 dark:hover:bg-red-700 text-red-700 dark:text-red-300'
                       : 'bg-gray-100 hover:bg-gray-200 dark:bg-gray-800 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300'
                   }`}
                   title={isRecording ? "Parar gravação" : "Gravar áudio"}
                 >
-                  {isRecording ? <MicOff className="w-4 h-4 mr-1" /> : <Mic className="w-4 h-4 mr-1" />}
+                  {isRecording ? <MicOff className="w-3 h-3 lg:w-4 lg:h-4 mr-1" /> : <Mic className="w-3 h-3 lg:w-4 lg:h-4 mr-1" />}
                   {isRecording ? 'Parar' : 'Áudio'}
                 </button>
               </div>
@@ -1002,16 +1045,16 @@ function ChatInterface({ user }) {
                   value={newMessage}
                   onChange={(e) => setNewMessage(e.target.value)}
                   onKeyPress={(e) => e.key === 'Enter' && sendMessage()}
-                  placeholder="Digite sua pergunta ou use as ferramentas acima..."
-                  className="flex-1 p-3 border border-gray-300 dark:border-gray-600 rounded-l-lg dark:bg-gray-700 dark:text-white"
+                  placeholder="Digite sua pergunta..."
+                  className="flex-1 p-2 lg:p-3 border border-gray-300 dark:border-gray-600 rounded-l-lg dark:bg-gray-700 dark:text-white text-sm lg:text-base"
                   disabled={loading}
                 />
                 <button
                   onClick={() => sendMessage()}
                   disabled={!newMessage.trim() || loading}
-                  className="px-4 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-r-lg disabled:opacity-50"
+                  className="px-3 lg:px-4 py-2 lg:py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-r-lg disabled:opacity-50"
                 >
-                  <Send className="w-5 h-5" />
+                  <Send className="w-4 h-4 lg:w-5 lg:h-5" />
                 </button>
               </div>
 
@@ -1033,15 +1076,15 @@ function ChatInterface({ user }) {
             </div>
           </>
         ) : (
-          <div className="flex-1 flex items-center justify-center">
-            <div className="text-center">
-              <MessageSquare className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-              <p className="text-lg text-gray-500 dark:text-gray-400 mb-2">
+          <div className="flex-1 flex items-center justify-center p-4">
+            <div className="text-center max-w-sm">
+              <MessageSquare className="w-12 h-12 lg:w-16 lg:h-16 text-gray-400 mx-auto mb-4" />
+              <p className="text-base lg:text-lg text-gray-500 dark:text-gray-400 mb-2">
                 Nenhuma conversa selecionada
               </p>
               <button
                 onClick={() => setShowNewChat(true)}
-                className="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg"
+                className="px-4 lg:px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm lg:text-base"
               >
                 Começar nova conversa
               </button>
