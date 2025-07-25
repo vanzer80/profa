@@ -97,11 +97,13 @@ class ProfAITester:
     def test_user_registration(self):
         """Test user registration endpoint"""
         try:
+            # Use a unique timestamp to avoid duplicate registrations
+            timestamp = int(time.time())
             user_data = {
-                "email": "maria.silva@escola.com",
-                "username": "maria_silva",
+                "email": f"joao.santos{timestamp}@escola.com",
+                "username": f"joao_santos_{timestamp}",
                 "password": "MinhaSenh@123",
-                "full_name": "Maria Silva Santos",
+                "full_name": "João Santos Silva",
                 "grade": "7º EF",
                 "school": "Escola Municipal João da Silva",
                 "ai_style": "paciente"
