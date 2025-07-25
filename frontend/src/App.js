@@ -305,7 +305,7 @@ function MainApp({ user, setUser }) {
 }
 
 // Sidebar Component
-function Sidebar({ user, setUser }) {
+function Sidebar({ user, setUser, isOpen, onClose }) {
   const { darkMode, setDarkMode } = React.useContext(ThemeContext);
   
   const handleLogout = () => {
@@ -321,68 +321,137 @@ function Sidebar({ user, setUser }) {
   ];
 
   return (
-    <div className="w-64 bg-white dark:bg-gray-800 shadow-lg flex flex-col">
-      <div className="p-6 border-b border-gray-200 dark:border-gray-700">
-        <h1 className="text-2xl font-bold text-gray-900 dark:text-white">ProfAI</h1>
-        <div className="flex items-center mt-4">
-          {user.avatar && (
-            <img 
-              src={`data:image/png;base64,${user.avatar}`}
-              alt="Avatar"
-              className="w-10 h-10 rounded-full mr-3"
-            />
-          )}
-          <div>
-            <p className="font-medium text-gray-900 dark:text-white">{user.full_name}</p>
-            <p className="text-sm text-gray-500 dark:text-gray-400">{user.grade}</p>
+    <>
+      {/* Desktop Sidebar */}
+      <div className="hidden lg:flex w-64 bg-white dark:bg-gray-800 shadow-lg flex-col">
+        <div className="p-6 border-b border-gray-200 dark:border-gray-700">
+          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">ProfAI</h1>
+          <div className="flex items-center mt-4">
+            {user.avatar && (
+              <img 
+                src={`data:image/png;base64,${user.avatar}`}
+                alt="Avatar"
+                className="w-10 h-10 rounded-full mr-3"
+              />
+            )}
+            <div>
+              <p className="font-medium text-gray-900 dark:text-white">{user.full_name}</p>
+              <p className="text-sm text-gray-500 dark:text-gray-400">{user.grade}</p>
+            </div>
+          </div>
+          <div className="flex items-center mt-3 space-x-4">
+            <div className="flex items-center text-yellow-600">
+              <Zap className="w-4 h-4 mr-1" />
+              <span className="text-sm font-medium">{user.xp} XP</span>
+            </div>
+            <div className="flex items-center text-yellow-500">
+              <Coins className="w-4 h-4 mr-1" />
+              <span className="text-sm font-medium">{user.coins}</span>
+            </div>
           </div>
         </div>
-        <div className="flex items-center mt-3 space-x-4">
-          <div className="flex items-center text-yellow-600">
-            <Zap className="w-4 h-4 mr-1" />
-            <span className="text-sm font-medium">{user.xp} XP</span>
-          </div>
-          <div className="flex items-center text-yellow-500">
-            <Coins className="w-4 h-4 mr-1" />
-            <span className="text-sm font-medium">{user.coins}</span>
+        
+        <nav className="flex-1 p-6">
+          <ul className="space-y-2">
+            {menuItems.map((item, index) => (
+              <li key={index}>
+                <a
+                  href={item.path}
+                  className="flex items-center p-3 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+                >
+                  <item.icon className="w-5 h-5 mr-3" />
+                  {item.label}
+                </a>
+              </li>
+            ))}
+          </ul>
+        </nav>
+        
+        <div className="p-6 border-t border-gray-200 dark:border-gray-700">
+          <div className="flex items-center justify-between">
+            <button
+              onClick={() => setDarkMode(!darkMode)}
+              className="p-2 rounded-lg text-gray-500 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-700"
+            >
+              {darkMode ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
+            </button>
+            <button
+              onClick={handleLogout}
+              className="flex items-center p-2 rounded-lg text-red-600 hover:bg-red-50 dark:hover:bg-red-900"
+            >
+              <LogOut className="w-5 h-5 mr-2" />
+              Sair
+            </button>
           </div>
         </div>
       </div>
-      
-      <nav className="flex-1 p-6">
-        <ul className="space-y-2">
-          {menuItems.map((item, index) => (
-            <li key={index}>
-              <a
-                href={item.path}
-                className="flex items-center p-3 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
-              >
-                <item.icon className="w-5 h-5 mr-3" />
-                {item.label}
-              </a>
-            </li>
-          ))}
-        </ul>
-      </nav>
-      
-      <div className="p-6 border-t border-gray-200 dark:border-gray-700">
-        <div className="flex items-center justify-between">
+
+      {/* Mobile Sidebar */}
+      <div className={`lg:hidden fixed inset-y-0 left-0 z-30 w-64 bg-white dark:bg-gray-800 shadow-lg transform transition-transform duration-300 ease-in-out ${isOpen ? 'translate-x-0' : '-translate-x-full'}`}>
+        <div className="flex items-center justify-between p-4 border-b border-gray-200 dark:border-gray-700">
+          <h1 className="text-xl font-bold text-gray-900 dark:text-white">ProfAI</h1>
           <button
-            onClick={() => setDarkMode(!darkMode)}
+            onClick={onClose}
             className="p-2 rounded-lg text-gray-500 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-700"
           >
-            {darkMode ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
-          </button>
-          <button
-            onClick={handleLogout}
-            className="flex items-center p-2 rounded-lg text-red-600 hover:bg-red-50 dark:hover:bg-red-900"
-          >
-            <LogOut className="w-5 h-5 mr-2" />
-            Sair
+            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+            </svg>
           </button>
         </div>
+        
+        <div className="p-4 border-b border-gray-200 dark:border-gray-700">
+          <div className="flex items-center">
+            {user.avatar && (
+              <img 
+                src={`data:image/png;base64,${user.avatar}`}
+                alt="Avatar"
+                className="w-8 h-8 rounded-full mr-3"
+              />
+            )}
+            <div>
+              <p className="font-medium text-gray-900 dark:text-white text-sm">{user.full_name}</p>
+              <p className="text-xs text-gray-500 dark:text-gray-400">{user.grade}</p>
+            </div>
+          </div>
+        </div>
+        
+        <nav className="flex-1 p-4">
+          <ul className="space-y-1">
+            {menuItems.map((item, index) => (
+              <li key={index}>
+                <a
+                  href={item.path}
+                  onClick={onClose}
+                  className="flex items-center p-3 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+                >
+                  <item.icon className="w-5 h-5 mr-3" />
+                  {item.label}
+                </a>
+              </li>
+            ))}
+          </ul>
+        </nav>
+        
+        <div className="p-4 border-t border-gray-200 dark:border-gray-700">
+          <div className="flex items-center justify-between">
+            <button
+              onClick={() => setDarkMode(!darkMode)}
+              className="p-2 rounded-lg text-gray-500 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-700"
+            >
+              {darkMode ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
+            </button>
+            <button
+              onClick={handleLogout}
+              className="flex items-center p-2 rounded-lg text-red-600 hover:bg-red-50 dark:hover:bg-red-900"
+            >
+              <LogOut className="w-5 h-5 mr-2" />
+              Sair
+            </button>
+          </div>
+        </div>
       </div>
-    </div>
+    </>
   );
 }
 
