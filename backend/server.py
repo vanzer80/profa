@@ -549,6 +549,170 @@ async def get_ai_styles():
         ]
     }
 
+# File processing endpoints
+@api_router.post("/files/upload")
+async def upload_file(
+    file: UploadFile = File(...),
+    conversation_id: str = Form(...),
+    current_user: User = Depends(get_current_user)
+):
+    """Upload and process files (PDF, images) with OCR"""
+    try:
+        # Verify conversation belongs to user
+        conversation = await db.conversations.find_one({
+            "id": conversation_id,
+            "user_id": current_user.id
+        })
+        if not conversation:
+            raise HTTPException(status_code=404, detail="Conversation not found")
+        
+        # Create storage directory
+        storage_dir = Path(os.getenv('LOCAL_STORAGE_PATH', './storage'))
+        storage_dir.mkdir(exist_ok=True)
+        
+        # Save uploaded file
+        file_id = str(uuid.uuid4())
+        file_ext = file.filename.split('.')[-1].lower()
+        file_path = storage_dir / f"{file_id}.{file_ext}"
+        
+        with open(file_path, "wb") as buffer:
+            shutil.copyfileobj(file.file, buffer)
+        
+        extracted_text = ""
+        
+        # Process different file types
+        if file_ext.lower() in ['png', 'jpg', 'jpeg', 'gif', 'bmp']:
+            # Image OCR using PIL and pytesseract (simplified)
+            try:
+                from PIL import Image
+                import pytesseract
+                
+                image = Image.open(file_path)
+                extracted_text = pytesseract.image_to_string(image, lang='por')
+            except Exception as e:
+                extracted_text = f"Imagem enviada: {file.filename} (OCR não disponível: {str(e)})"
+                
+        elif file_ext.lower() == 'pdf':
+            # PDF processing (simplified)
+            try:
+                from unstructured.partition.pdf import partition_pdf
+                elements = partition_pdf(str(file_path))
+                extracted_text = "\n".join([str(element) for element in elements])
+            except Exception as e:
+                extracted_text = f"PDF enviado: {file.filename} (Processamento não disponível: {str(e)})"
+        else:
+            extracted_text = f"Arquivo enviado: {file.filename} (Tipo não suportado para extração de texto)"
+        
+        # Save file info to database
+        file_doc = {
+            "id": file_id,
+            "conversation_id": conversation_id,
+            "user_id": current_user.id,
+            "filename": file.filename,
+            "file_type": file_ext,
+            "file_path": str(file_path),
+            "extracted_text": extracted_text,
+            "created_at": datetime.utcnow()
+        }
+        await db.files.insert_one(file_doc)
+        
+        return {
+            "file_id": file_id,
+            "filename": file.filename,
+            "extracted_text": extracted_text,
+            "message": f"Arquivo processado: {file.filename}\n\nTexto extraído:\n{extracted_text}"
+        }
+        
+    except Exception as e:
+        logging.error(f"File upload error: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Error processing file: {str(e)}")
+
+# Audio processing endpoints
+@api_router.post("/audio/stt")
+async def speech_to_text(
+    audio: UploadFile = File(...),
+    current_user: User = Depends(get_current_user)
+):
+    """Convert speech to text using OpenAI Whisper"""
+    try:
+        # Save audio file temporarily
+        storage_dir = Path(os.getenv('LOCAL_STORAGE_PATH', './storage'))
+        storage_dir.mkdir(exist_ok=True)
+        
+        audio_id = str(uuid.uuid4())
+        audio_ext = audio.filename.split('.')[-1].lower()
+        audio_path = storage_dir / f"{audio_id}.{audio_ext}"
+        
+        with open(audio_path, "wb") as buffer:
+            shutil.copyfileobj(audio.file, buffer)
+        
+        # Use OpenAI Whisper for transcription
+        client_openai = openai.OpenAI(api_key=os.getenv('OPENAI_API_KEY'))
+        
+        with open(audio_path, "rb") as audio_file:
+            transcript = client_openai.audio.transcriptions.create(
+                model="whisper-1",
+                file=audio_file,
+                language="pt"
+            )
+        
+        # Clean up temporary file
+        os.unlink(audio_path)
+        
+        return {
+            "text": transcript.text,
+            "message": f"Áudio transcrito: {transcript.text}"
+        }
+        
+    except Exception as e:
+        logging.error(f"STT error: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Error processing audio: {str(e)}")
+
+@api_router.post("/audio/tts")
+async def text_to_speech(
+    text: str = Form(...),
+    current_user: User = Depends(get_current_user)
+):
+    """Convert text to speech using OpenAI TTS"""
+    try:
+        if len(text) > 4096:
+            raise HTTPException(status_code=400, detail="Text too long (max 4096 characters)")
+        
+        # Use OpenAI TTS
+        client_openai = openai.OpenAI(api_key=os.getenv('OPENAI_API_KEY'))
+        
+        response = client_openai.audio.speech.create(
+            model="tts-1",
+            voice="nova",  # Portuguese-friendly voice
+            input=text,
+            response_format="mp3"
+        )
+        
+        # Save audio file
+        storage_dir = Path(os.getenv('LOCAL_STORAGE_PATH', './storage'))
+        storage_dir.mkdir(exist_ok=True)
+        
+        audio_id = str(uuid.uuid4())
+        audio_path = storage_dir / f"{audio_id}.mp3"
+        
+        response.stream_to_file(str(audio_path))
+        
+        # Convert to base64 for frontend
+        with open(audio_path, "rb") as audio_file:
+            audio_b64 = base64.b64encode(audio_file.read()).decode()
+        
+        # Clean up file
+        os.unlink(audio_path)
+        
+        return {
+            "audio_base64": audio_b64,
+            "message": "Áudio gerado com sucesso"
+        }
+        
+    except Exception as e:
+        logging.error(f"TTS error: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Error generating audio: {str(e)}")
+
 # Health check
 @api_router.get("/health")
 async def health_check():
