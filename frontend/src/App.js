@@ -1054,7 +1054,41 @@ function ChatInterface({ user }) {
 
 // Message Bubble Component
 function MessageBubble({ message }) {
+  const [isPlaying, setIsPlaying] = useState(false);
   const isUser = message.role === 'user';
+  
+  const playAudio = async (text) => {
+    if (isPlaying) return;
+    
+    setIsPlaying(true);
+    try {
+      const token = localStorage.getItem('token');
+      const formData = new FormData();
+      formData.append('text', text);
+      
+      const response = await axios.post(`${API}/audio/tts`, formData, {
+        headers: { 
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'multipart/form-data'
+        }
+      });
+      
+      // Play audio from base64
+      const audioBlob = new Blob([Uint8Array.from(atob(response.data.audio_base64), c => c.charCodeAt(0))], { type: 'audio/mp3' });
+      const audioUrl = URL.createObjectURL(audioBlob);
+      const audio = new Audio(audioUrl);
+      
+      audio.onended = () => {
+        setIsPlaying(false);
+        URL.revokeObjectURL(audioUrl);
+      };
+      
+      await audio.play();
+    } catch (error) {
+      console.error('Error playing audio:', error);
+      setIsPlaying(false);
+    }
+  };
   
   if (isUser) {
     return (
@@ -1164,7 +1198,7 @@ function MessageBubble({ message }) {
                 </div>
               )}
 
-              {/* XP and Coins earned */}
+              {/* XP and Coins earned + Audio Button */}
               <div className="flex items-center justify-between pt-2 border-t border-gray-200 dark:border-gray-600">
                 <div className="flex items-center space-x-4">
                   <div className="flex items-center text-yellow-600">
@@ -1175,6 +1209,15 @@ function MessageBubble({ message }) {
                     <Coins className="w-4 h-4 mr-1" />
                     <span className="text-sm font-medium">+{aiResponse.coins}</span>
                   </div>
+                  <button
+                    onClick={() => playAudio(aiResponse.explanation)}
+                    disabled={isPlaying}
+                    className="flex items-center text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-200 disabled:opacity-50"
+                    title="Ouvir resposta"
+                  >
+                    <Volume2 className="w-4 h-4 mr-1" />
+                    <span className="text-xs">{isPlaying ? 'Tocando...' : 'Ouvir'}</span>
+                  </button>
                 </div>
                 <span className="text-xs text-gray-500 dark:text-gray-400">
                   {new Date(message.created_at).toLocaleTimeString('pt-BR', { 
