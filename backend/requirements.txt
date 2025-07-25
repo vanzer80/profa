@@ -25,6 +25,6 @@ jq>=1.6.0
 typer>=0.9.0
 openai>=1.0.0
 bcrypt>=4.0.0
-python-unstructured>=0.10.0
+unstructured>=0.10.0
 pillow>=10.0.0
 pytesseract>=0.3.0
