@@ -684,6 +684,10 @@ function ChatInterface({ user }) {
   const [newMessage, setNewMessage] = useState('');
   const [loading, setLoading] = useState(false);
   const [showNewChat, setShowNewChat] = useState(false);
+  const [isRecording, setIsRecording] = useState(false);
+  const [mediaRecorder, setMediaRecorder] = useState(null);
+  const fileInputRef = useRef(null);
+  const imageInputRef = useRef(null);
 
   const subjects = [
     'Matemática', 'Português', 'Ciências', 'História', 'Geografia',
@@ -740,12 +744,13 @@ function ChatInterface({ user }) {
     }
   };
 
-  const sendMessage = async (requestType = 'help') => {
-    if (!newMessage.trim() || !currentConversation) return;
+  const sendMessage = async (requestType = 'help', messageText = null) => {
+    const messageToSend = messageText || newMessage;
+    if (!messageToSend.trim() || !currentConversation) return;
 
     const userMessage = {
       id: Date.now().toString(),
-      content: newMessage,
+      content: messageToSend,
       role: 'user',
       created_at: new Date().toISOString(),
       message_type: requestType
@@ -753,14 +758,14 @@ function ChatInterface({ user }) {
 
     setMessages([...messages, userMessage]);
     setLoading(true);
-    setNewMessage('');
+    if (!messageText) setNewMessage('');
 
     try {
       const token = localStorage.getItem('token');
       const response = await axios.post(`${API}/chat`,
         {
           conversation_id: currentConversation.id,
-          message: newMessage,
+          message: messageToSend,
           request_type: requestType,
           subject: currentConversation.subject
         },
@@ -772,6 +777,87 @@ function ChatInterface({ user }) {
       console.error('Error sending message:', error);
     } finally {
       setLoading(false);
+    }
+  };
+
+  // File upload handler
+  const handleFileUpload = async (file) => {
+    if (!currentConversation) return;
+
+    const formData = new FormData();
+    formData.append('file', file);
+    formData.append('conversation_id', currentConversation.id);
+
+    try {
+      const token = localStorage.getItem('token');
+      const response = await axios.post(`${API}/files/upload`, formData, {
+        headers: { 
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'multipart/form-data'
+        }
+      });
+
+      // Send the extracted text as a message
+      await sendMessage('help', response.data.message);
+    } catch (error) {
+      console.error('Error uploading file:', error);
+      alert('Erro ao processar arquivo');
+    }
+  };
+
+  // Audio recording
+  const startRecording = async () => {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      const recorder = new MediaRecorder(stream);
+      const chunks = [];
+
+      recorder.ondataavailable = (event) => {
+        chunks.push(event.data);
+      };
+
+      recorder.onstop = async () => {
+        const audioBlob = new Blob(chunks, { type: 'audio/wav' });
+        await handleAudioUpload(audioBlob);
+        stream.getTracks().forEach(track => track.stop());
+      };
+
+      recorder.start();
+      setMediaRecorder(recorder);
+      setIsRecording(true);
+    } catch (error) {
+      console.error('Error starting recording:', error);
+      alert('Erro ao acessar microfone');
+    }
+  };
+
+  const stopRecording = () => {
+    if (mediaRecorder) {
+      mediaRecorder.stop();
+      setMediaRecorder(null);
+      setIsRecording(false);
+    }
+  };
+
+  const handleAudioUpload = async (audioBlob) => {
+    if (!currentConversation) return;
+
+    const formData = new FormData();
+    formData.append('audio', audioBlob, 'recording.wav');
+
+    try {
+      const token = localStorage.getItem('token');
+      const response = await axios.post(`${API}/audio/stt`, formData, {
+        headers: { 
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'multipart/form-data'
+        }
+      });
+
+      setNewMessage(response.data.text);
+    } catch (error) {
+      console.error('Error processing audio:', error);
+      alert('Erro ao processar áudio');
     }
   };
 
@@ -848,7 +934,8 @@ function ChatInterface({ user }) {
 
             {/* Input Area */}
             <div className="p-4 border-t border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">
-              <div className="flex space-x-2 mb-3">
+              {/* Action Buttons Row */}
+              <div className="flex space-x-2 mb-3 flex-wrap">
                 <button
                   onClick={() => sendMessage('help')}
                   disabled={!newMessage.trim() || loading}
@@ -874,14 +961,47 @@ function ChatInterface({ user }) {
                   Ver resposta (+2 XP)
                 </button>
               </div>
+
+              {/* Multimedia Buttons Row */}
+              <div className="flex space-x-2 mb-3">
+                <button
+                  onClick={() => fileInputRef.current?.click()}
+                  className="flex items-center px-3 py-1 bg-purple-100 hover:bg-purple-200 dark:bg-purple-800 dark:hover:bg-purple-700 text-purple-700 dark:text-purple-300 rounded-full text-sm"
+                  title="Upload PDF/Documento"
+                >
+                  <FileText className="w-4 h-4 mr-1" />
+                  Arquivo
+                </button>
+                <button
+                  onClick={() => imageInputRef.current?.click()}
+                  className="flex items-center px-3 py-1 bg-indigo-100 hover:bg-indigo-200 dark:bg-indigo-800 dark:hover:bg-indigo-700 text-indigo-700 dark:text-indigo-300 rounded-full text-sm"
+                  title="Upload Imagem"
+                >
+                  <ImageIcon className="w-4 h-4 mr-1" />
+                  Foto
+                </button>
+                <button
+                  onClick={isRecording ? stopRecording : startRecording}
+                  className={`flex items-center px-3 py-1 rounded-full text-sm ${
+                    isRecording 
+                      ? 'bg-red-100 hover:bg-red-200 dark:bg-red-800 dark:hover:bg-red-700 text-red-700 dark:text-red-300'
+                      : 'bg-gray-100 hover:bg-gray-200 dark:bg-gray-800 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300'
+                  }`}
+                  title={isRecording ? "Parar gravação" : "Gravar áudio"}
+                >
+                  {isRecording ? <MicOff className="w-4 h-4 mr-1" /> : <Mic className="w-4 h-4 mr-1" />}
+                  {isRecording ? 'Parar' : 'Áudio'}
+                </button>
+              </div>
               
+              {/* Text Input */}
               <div className="flex">
                 <input
                   type="text"
                   value={newMessage}
                   onChange={(e) => setNewMessage(e.target.value)}
                   onKeyPress={(e) => e.key === 'Enter' && sendMessage()}
-                  placeholder="Digite sua pergunta..."
+                  placeholder="Digite sua pergunta ou use as ferramentas acima..."
                   className="flex-1 p-3 border border-gray-300 dark:border-gray-600 rounded-l-lg dark:bg-gray-700 dark:text-white"
                   disabled={loading}
                 />
@@ -893,6 +1013,22 @@ function ChatInterface({ user }) {
                   <Send className="w-5 h-5" />
                 </button>
               </div>
+
+              {/* Hidden file inputs */}
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept=".pdf,.doc,.docx,.txt"
+                onChange={(e) => e.target.files[0] && handleFileUpload(e.target.files[0])}
+                className="hidden"
+              />
+              <input
+                ref={imageInputRef}
+                type="file"
+                accept="image/*"
+                onChange={(e) => e.target.files[0] && handleFileUpload(e.target.files[0])}
+                className="hidden"
+              />
             </div>
           </>
         ) : (
