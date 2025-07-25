@@ -686,6 +686,7 @@ function ChatInterface({ user }) {
   const [showNewChat, setShowNewChat] = useState(false);
   const [isRecording, setIsRecording] = useState(false);
   const [mediaRecorder, setMediaRecorder] = useState(null);
+  const [showConversations, setShowConversations] = useState(false);
   const fileInputRef = useRef(null);
   const imageInputRef = useRef(null);
 
