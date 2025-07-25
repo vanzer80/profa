@@ -249,10 +249,10 @@
 
 ## test_plan:
   current_focus:
-    - "OpenAI Integration and Chat System"
-    - "Authentication System (JWT)"
     - "Chat Interface with Help/Hint/Answer Buttons"
     - "Authentication UI (Login/Register)"
+    - "Dashboard UI"
+    - "User Profile Management UI"
   stuck_tasks: []
   test_all: false
   test_priority: "high_first"
